@@ -12,3 +12,6 @@ Simple raytracer with python
 ## Dependency
 - Python3.2
 - Pygame1.9.2
+
+## Gallery
+[http://blog.csdn.net/i_dovelemon/article/details/71079364]: http://blog.csdn.net/i_dovelemon/article/details/71079364
