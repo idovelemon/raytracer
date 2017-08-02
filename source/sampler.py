@@ -148,9 +148,10 @@ class HammersleySampler(Sampler):
     def radicalInverseBase2(self, v):
         x = 0.0
         f = 0.5
+        v = int(v)
         while v != 0:
-            x += f * (~int(v) & 1)
-            v /= 2
+            x += f * (v & 1)
+            v = math.floor(v / 2)
             f *= 0.5
         return x
         
