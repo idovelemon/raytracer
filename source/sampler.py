@@ -26,6 +26,7 @@ class Sampler(metaclass=ABCMeta):
     JITTERED = 1
     NROOK = 2
     MULTIJITTERED = 3
+    HAMMERSLEY = 4
     
     def __init__(self, sampler_type):
         self.type = sampler_type
@@ -140,6 +141,26 @@ class MultiJitteredSampler(Sampler):
                 col_lists[j].remove(col)
                 row_lists[i].remove(row)
 
+class HammersleySampler(Sampler):
+    def __init__(self):
+        super().__init__(Sampler.MULTIJITTERED)
+
+    def radicalInverseBase2(self, v):
+        x = 0.0
+        f = 0.5
+        while v != 0:
+            x += f * (~int(v) & 1)
+            v /= 2
+            f *= 0.5
+        return x
+        
+    def genSamplersInUnitSqure(self, num):
+        self.samplers = []
+        for i in range(num):
+            x = i * 1.0 / num
+            y = self.radicalInverseBase2(i)
+            self.samplers.append(Vector2(x, y))
+
 if __name__ == "__main__":
     def test_random():        
         w = Window(400, 400)
@@ -183,11 +204,31 @@ if __name__ == "__main__":
             x = sampler.x * 400
             y = sampler.y * 400
             w.pixel(x, y, Color(0, 0, 0))
-        w.update           
+        w.update
+
+    def test_hammersley():
+        w = Window(400, 400)
+        s = HammersleySampler()
+        s.genSamplersInUnitSqure(256)
+        samplers = s.getSamplers()
+        color_buf = []
+        for i in range(400):
+            for j in range(400):
+                color_buf.append(0.0) #r
+                color_buf.append(0.0) #g
+                color_buf.append(0.0) #b
+        for sampler in samplers:
+            x = sampler.x * 400
+            y = sampler.y * 400
+            color_buf[int(y) * 400 * 3 + int(x) * 3 + 0] = 1.0
+            color_buf[int(y) * 400 * 3 + int(x) * 3 + 1] = 0.0
+            color_buf[int(y) * 400 * 3 + int(x) * 3 + 2] = 0.0
+        w.save("hammersley256.png", color_buf, 400, 400)
         
     #test_random()
     #test_jittered()
     #test_nrook()
-    test_multijittered()
+    #test_multijittered()
+    test_hammersley()
         
 
